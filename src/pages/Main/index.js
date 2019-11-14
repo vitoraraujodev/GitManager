@@ -5,7 +5,7 @@ import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 import Container from '../../components/Container';
-import { Form, SubmitButton, List } from './styles';
+import { Form, SubmitButton, List, Input } from './styles';
 
 import api from '../../services/api';
 
@@ -14,6 +14,7 @@ export default class Main extends Component {
     newRepo: '',
     repositories: [],
     loading: false,
+    repoNotFound: false,
   };
 
   componentDidMount() {
@@ -41,23 +42,31 @@ export default class Main extends Component {
 
     this.setState({ loading: true });
 
-    const { newRepo, repositories } = this.state;
+    try {
+      const { newRepo, repositories } = this.state;
 
-    const response = await api.get(`/repos/${newRepo}`);
+      const response = await api.get(`/repos/${newRepo}`);
 
-    const data = {
-      name: response.data.full_name,
-    };
+      const data = {
+        name: response.data.full_name,
+      };
 
-    this.setState({
-      repositories: [...repositories, data],
-      newRepo: '',
-      loading: false,
-    });
+      this.setState({
+        repositories: [...repositories, data],
+        newRepo: '',
+        loading: false,
+        repoNotFound: false,
+      });
+    } catch (error) {
+      this.setState({
+        repoNotFound: true,
+        loading: false,
+      });
+    }
   };
 
   render() {
-    const { newRepo, repositories, loading } = this.state;
+    const { newRepo, repositories, loading, repoNotFound } = this.state;
 
     return (
       <Container>
@@ -66,11 +75,12 @@ export default class Main extends Component {
           Repositórios
         </h1>
         <Form onSubmit={this.handleSubmit}>
-          <input
+          <Input
             type="text"
             placeholder="Adicionar repositório"
             value={newRepo}
             onChange={this.handleInputChange}
+            repoNotFound={repoNotFound ? 1 : 0}
           />
           <SubmitButton loading={loading ? 1 : 0}>
             {loading ? (
