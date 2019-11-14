@@ -6,7 +6,7 @@ export const Form = styled.form`
   flex-direction: row;
 `;
 
-export const Input = styled.input.attrs(props => ({}))`
+export const Input = styled.input.attrs()`
   flex: 1;
   border: 1px solid #eee;
   padding: 10px 15px;
